@@ -1,0 +1,22 @@
+# 1. 必须排除前端文件夹（因为它有自己的仓库）
+/frontend/
+
+# 2. 排除 Python 运行产生的缓存
+**/__pycache__/
+*.pyc
+
+# 3. 排除本地日志和临时文件
+*.log
+app.log
+
+# 4. 排除敏感配置文件（建议手动备份，不上传到公开仓库）
+.env
+
+# 5. 排除虚拟环境（如果文件夹名是 venv 或 .venv）
+venv/
+.venv/
+
+# 6. 排除 IDE 配置
+.idea/
+.vscode/
+node_modules

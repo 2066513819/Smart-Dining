@@ -1,0 +1,43 @@
+# ===== Python / 后端 =====
+__pycache__/
+*.py[cod]
+*.egg-info/
+*.egg
+.venv/
+venv/
+env/
+.pytest_cache/
+.mypy_cache/
+
+# ===== Node / 前端 =====
+node_modules/
+dist/
+dist-ssr/
+.vite/
+*.local
+frontend/node_modules/
+
+# ===== 环境变量与密钥（切勿提交真实密钥） =====
+.env
+.env.*
+!.env.example
+frontend/.env
+frontend/.env.*
+
+# ===== 日志 =====
+*.log
+app.log
+
+# ===== 用户上传数据（保留目录结构，忽略内容） =====
+uploads/*
+!uploads/.gitkeep
+
+# ===== IDE / 编辑器 / 系统文件 =====
+.idea/
+.vscode/
+*.swp
+.DS_Store
+Thumbs.db
+
+# ===== 构建产物 / 类型检查缓存 =====
+*.tsbuildinfo

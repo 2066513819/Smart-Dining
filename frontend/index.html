@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>餐饮推荐系统</title>
+    <script> 
+      window.difyChatbotConfig = { 
+       token: 'BjytYXP8CW4sh8Si', 
+       baseUrl: 'http://localhost', 
+      } 
+     </script> 
+     <script 
+      src="http://localhost/embed.min.js" 
+      id="BjytYXP8CW4sh8Si" 
+      defer> 
+     </script> 
+     <style> 
+        #dify-chatbot-bubble-button { 
+          display: none !important; /* 默认隐藏 */
+          background-color: #1C64F2 !important; 
+          bottom: 20px !important;
+          right: 20px !important;
+          cursor: move !important;
+          user-select: none !important;
+          touch-action: none !important;
+          z-index: 2147483647 !important;
+        } 
+        /* 仅在 body 带有 show-chatbot 类时显示 */
+        body.show-chatbot #dify-chatbot-bubble-button {
+          display: flex !important;
+        }
+        #dify-chatbot-bubble-window { 
+          width: 24rem !important; 
+          height: 40rem !important; 
+          z-index: 2147483647 !important;
+        } 
+      </style>
+      <script>
+        // 拖拽逻辑
+        (function() {
+          const initDraggable = () => {
+            const button = document.querySelector('#dify-chatbot-bubble-button');
+            if (!button) {
+              setTimeout(initDraggable, 500);
+              return;
+            }
+
+            let isDragging = false;
+            let startX, startY;
+            let initialRight, initialBottom;
+
+            button.addEventListener('mousedown', (e) => {
+              isDragging = false;
+              startX = e.clientX;
+              startY = e.clientY;
+              const rect = button.getBoundingClientRect();
+              initialRight = window.innerWidth - rect.right;
+              initialBottom = window.innerHeight - rect.bottom;
+
+              const onMouseMove = (moveEvent) => {
+                const deltaX = startX - moveEvent.clientX;
+                const deltaY = startY - moveEvent.clientY;
+                if (Math.abs(deltaX) > 5 || Math.abs(deltaY) > 5) {
+                  isDragging = true;
+                  const newRight = initialRight + deltaX;
+                  const newBottom = initialBottom + deltaY;
+                  const boundedRight = Math.max(0, Math.min(window.innerWidth - 60, newRight));
+                  const boundedBottom = Math.max(0, Math.min(window.innerHeight - 60, newBottom));
+                  button.style.setProperty('right', `${boundedRight}px`, 'important');
+                  button.style.setProperty('bottom', `${boundedBottom}px`, 'important');
+                }
+              };
+
+              const onMouseUp = () => {
+                document.removeEventListener('mousemove', onMouseMove);
+                document.removeEventListener('mouseup', onMouseUp);
+                if (isDragging) {
+                  const captureClick = (clickEvent) => {
+                    clickEvent.stopPropagation();
+                    clickEvent.preventDefault();
+                    button.removeEventListener('click', captureClick, true);
+                  };
+                  button.addEventListener('click', captureClick, true);
+                }
+              };
+              document.addEventListener('mousemove', onMouseMove);
+              document.addEventListener('mouseup', onMouseUp);
+            });
+          };
+          if (document.readyState === 'complete') initDraggable();
+          else window.addEventListener('load', initDraggable);
+        })();
+      </script>
+    </head>
+  <body>
+    <div id="app"></div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

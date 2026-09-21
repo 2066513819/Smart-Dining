@@ -1,0 +1,48 @@
+{% extends 'layouts/base.html' %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-12">
+        <div class="ibox-content">
+            <h2>已发布菜谱计划</h2>
+            <p class="text-muted">以下为最近发布的菜谱计划（从数据库读取）</p>
+        </div>
+    </div>
+</div>
+
+<div class="row" style="margin-top:20px;">
+    <div class="col-lg-12">
+        <div class="ibox">
+            <div class="ibox-content">
+                {% if published_plans and published_plans|length > 0 %}
+                    <div class="list-group">
+                    {% for plan in published_plans %}
+                        <div class="list-group-item">
+                            <div style="display:flex;justify-content:space-between;align-items:center;">
+                                <div>
+                                    <h5 style="margin:0;">{{ plan.name }}</h5>
+                                    <div class="text-muted">发布时间：{{ plan.published_at or plan.date }}</div>
+                                    <div style="margin-top:6px;color:#666;">包含 {{ plan.meals|length if plan.meals is iterable else (plan.meals|default([])|length) }} 道菜</div>
+                                </div>
+                                <div>
+                                    <a class="btn btn-sm btn-primary" href="/recommendation">查看/生成菜谱</a>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="text-muted">暂无已发布的菜谱计划</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block js %}
+<script>
+    $(function(){ console.log('home 页面已渲染'); })
+</script>
+{% endblock %}

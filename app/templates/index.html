@@ -1,0 +1,105 @@
+{% extends 'layouts/base.html' %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-12">
+        <div class="ibox-content">
+            <div class="jumbotron">
+                <h1 class="display-4">欢迎使用餐饮推荐系统</h1>
+                <p class="lead">智能推荐，健康饮食</p>
+                <hr class="my-4">
+                <p>本系统基于人工智能技术，为不同年龄段的学生提供个性化的餐饮推荐服务。</p>
+                <a class="btn btn-primary btn-lg" href="#" role="button">开始使用</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-3">
+        <div class="ibox">
+            <div class="ibox-title">
+                <h5>智能推荐</h5>
+            </div>
+            <div class="ibox-content">
+                <p>根据学生的年龄、学校、饮食习惯等信息，智能推荐适合的菜品。</p>
+                <div class="m-t-sm">
+                    <a href="/recommendation" class="btn btn-white btn-sm"><i class="fa fa-arrow-right"></i> 进入推荐</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-3">
+        <div class="ibox">
+            <div class="ibox-title">
+                <h5>菜品管理</h5>
+            </div>
+            <div class="ibox-content">
+                <p>全面的菜品信息管理，包括菜品名称、配料、营养成分等。</p>
+                <div class="m-t-sm">
+                    <a href="/dish/list" class="btn btn-white btn-sm"><i class="fa fa-arrow-right"></i> 管理菜品</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-3">
+        <div class="ibox">
+            <div class="ibox-title">
+                <h5>已发布菜谱</h5>
+            </div>
+            <div class="ibox-content">
+                <p>展示最近已发布的菜谱计划，方便查看与复用。</p>
+                <div class="m-t-sm">
+                    <a href="/" class="btn btn-white btn-sm"><i class="fa fa-arrow-right"></i> 查看已发布</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-3">
+        <div class="ibox">
+            <div class="ibox-title">
+                <h5>系统管理</h5>
+            </div>
+            <div class="ibox-content">
+                <p>完善的用户管理、角色管理、权限管理等系统功能。</p>
+                <div class="m-t-sm">
+                    <a href="/system/user" class="btn btn-white btn-sm"><i class="fa fa-arrow-right"></i> 系统管理</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- 已发布的菜谱计划 -->
+<div class="row" style="margin-top:20px;">
+    <div class="col-lg-12">
+        <div class="ibox">
+            <div class="ibox-title">
+                <h5>已发布菜谱计划</h5>
+            </div>
+            <div class="ibox-content">
+                {% if published_plans and published_plans|length > 0 %}
+                    <ul class="list-group">
+                    {% for plan in published_plans %}
+                        <li class="list-group-item">
+                            <strong>{{ plan.name }}</strong>
+                            <span class="text-muted" style="margin-left:10px;">{{ plan.published_at.strftime('%Y-%m-%d') if plan.published_at else plan.date }}</span>
+                            <div style="margin-top:6px;color:#666;">包含 {{ plan.meals|length }} 道菜</div>
+                        </li>
+                    {% endfor %}
+                    </ul>
+                {% else %}
+                    <p class="text-muted">暂无已发布的菜谱计划</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block js %}
+<script>
+    $(document).ready(function() {
+        console.log("餐饮推荐系统首页加载完成");
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,376 @@
+{% extends 'layouts/base.html' %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-12">
+        <div class="ibox">
+            <div class="ibox-title">
+                <h5>菜品管理（菜品库 menu_items）</h5>
+                <div class="ibox-tools">
+                    <a href="#" class="btn btn-primary btn-xs" id="addDishBtn">
+                        <i class="fa fa-plus"></i> 添加菜品
+                    </a>
+                    <a href="#" class="btn btn-default btn-xs" id="refreshBtn">
+                        <i class="fa fa-refresh"></i> 刷新
+                    </a>
+                </div>
+            </div>
+            <div class="ibox-content">
+                <div class="row mb-3">
+                    <div class="col-sm-6">
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="searchInput" placeholder="请输入菜品名称或配方关键词">
+                            <div class="input-group-append">
+                                <button class="btn btn-primary" type="button" id="searchBtn">搜索</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-sm-3">
+                        <select class="form-control" id="dishTypeSelect">
+                            <option value="">全部餐次</option>
+                            <option value="breakfast">早餐</option>
+                            <option value="lunch">午餐</option>
+                            <option value="dinner">晚餐</option>
+                        </select>
+                    </div>
+                    <div class="col-sm-3">
+                        <select class="form-control" id="flavorSelect">
+                            <option value="">全部口味</option>
+                            <option value="咸">咸</option>
+                            <option value="甜">甜</option>
+                            <option value="酸">酸</option>
+                            <option value="辣">辣</option>
+                            <option value="鲜">鲜</option>
+                        </select>
+                    </div>
+                    <div class="col-sm-3">
+                        <button class="btn btn-secondary" type="button" id="filterBtn">筛选</button>
+                    </div>
+                </div>
+                
+                <div class="table-responsive">
+                    <table class="table table-striped table-bordered table-hover">
+                        <thead>
+                            <tr>
+                                <th style="width: 50px;">序号</th>
+                                <th>菜品名称</th>
+                                <th>餐次类型</th>
+                                <th>种类</th>
+                                <th>配方</th>
+                                <th>营养（卡路里/蛋白质）</th>
+                                <th style="width: 150px;">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="dishTableBody">
+                            <!-- 菜品数据将通过AJAX动态加载 -->
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="dataTables_info" id="dishTableInfo" role="status" aria-live="polite">显示 0 到 0 条，共 0 条记录</div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="dataTables_paginate paging_simple_numbers" id="dishTablePagination">
+                            <ul class="pagination"></ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 菜品添加/编辑模态框 -->
+<div class="modal fade" id="dishModal" tabindex="-1" role="dialog" aria-labelledby="dishModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="dishModalLabel">添加菜品</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form id="dishForm">
+                <div class="modal-body">
+                    <input type="hidden" id="dishId" name="id">
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="dishName">菜品名称 *</label>
+                            <input type="text" class="form-control" id="dishName" name="dish_name" placeholder="请输入菜品名称" required>
+                        </div>
+                        <div class="form-group col-md-3">
+                            <label for="dishType">餐次类型 *</label>
+                            <select class="form-control" id="dishType" name="dish_type" required>
+                                <option value="breakfast">早餐</option>
+                                <option value="lunch">午餐</option>
+                                <option value="dinner">晚餐</option>
+                            </select>
+                        </div>
+                        <div class="form-group col-md-3">
+                            <label for="dishCategory">种类</label>
+                            <select class="form-control" id="dishCategory" name="category">
+                                <option value="">请选择</option>
+                                <option value="荤菜类">荤菜类</option>
+                                <option value="主食类">主食类</option>
+                                <option value="素菜类">素菜类</option>
+                                <option value="豆制品类">豆制品类</option>
+                                <option value="奶及奶制品类">奶及奶制品类</option>
+                                <option value="水果类">水果类</option>
+                                <option value="饮料类">饮料类</option>
+                                <option value="调味料类">调味料类</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="dishRecipe">配方</label>
+                        <textarea class="form-control" id="dishRecipe" name="dish_recipe" rows="3" placeholder="请输入菜品配方"></textarea>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-4">
+                            <label for="dishFlavor">口味</label>
+                            <input type="text" class="form-control" id="dishFlavor" name="flavor" placeholder="如：清淡、麻辣">
+                        </div>
+                        <div class="form-group col-md-4">
+                            <label for="dishSeason">时令</label>
+                            <input type="text" class="form-control" id="dishSeason" name="season" placeholder="如：四季、夏季">
+                        </div>
+                        <div class="form-group col-md-4">
+                            <label for="dishCalories">卡路里</label>
+                            <input type="number" step="0.1" class="form-control" id="dishCalories" name="total_calories" value="0">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-4">
+                            <label for="dishProtein">蛋白质(g)</label>
+                            <input type="number" step="0.1" class="form-control" id="dishProtein" name="total_protein" value="0">
+                        </div>
+                        <div class="form-group col-md-4">
+                            <label for="dishFat">脂肪(g)</label>
+                            <input type="number" step="0.1" class="form-control" id="dishFat" name="total_fat" value="0">
+                        </div>
+                        <div class="form-group col-md-4">
+                            <label for="dishCarbs">碳水(g)</label>
+                            <input type="number" step="0.1" class="form-control" id="dishCarbs" name="total_carbohydrates" value="0">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
+                    <button type="submit" class="btn btn-primary">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block js %}
+<script>
+    $(document).ready(function() {
+        loadDishes();
+        
+        $('#searchBtn').click(function() { loadDishes(); });
+        $('#filterBtn').click(function() { loadDishes(); });
+        $('#searchInput').keypress(function(e) {
+            if (e.which == 13) { loadDishes(); return false; }
+        });
+        $('#refreshBtn').click(function() {
+            $('#searchInput').val('');
+            $('#dishTypeSelect').val('');
+            $('#flavorSelect').val('');
+            loadDishes();
+        });
+        
+        $('#addDishBtn').click(function() {
+            $('#dishForm')[0].reset();
+            $('#dishId').val('');
+            $('#dishCalories, #dishProtein, #dishFat, #dishCarbs').val(0);
+            $('#dishModalLabel').text('添加菜品');
+            $('#dishModal').modal('show');
+        });
+        
+        $('#dishForm').submit(function(e) {
+            e.preventDefault();
+            var dishId = $('#dishId').val();
+            var payload = {
+                dish_name: $('#dishName').val(),
+                dish_type: $('#dishType').val(),
+                category: $('#dishCategory').val() || '',
+                dish_recipe: $('#dishRecipe').val() || '',
+                flavor: $('#dishFlavor').val() || '',
+                season: $('#dishSeason').val() || '',
+                total_calories: parseFloat($('#dishCalories').val()) || 0,
+                total_protein: parseFloat($('#dishProtein').val()) || 0,
+                total_fat: parseFloat($('#dishFat').val()) || 0,
+                total_carbohydrates: parseFloat($('#dishCarbs').val()) || 0
+            };
+            
+            var url = '/menu_items/';
+            var method = 'POST';
+            if (dishId) {
+                url = '/menu_items/' + dishId;
+                method = 'PUT';
+            }
+            
+            $.ajax({
+                url: url,
+                type: method,
+                contentType: 'application/json',
+                data: JSON.stringify(payload),
+                success: function(response) {
+                    $('#dishModal').modal('hide');
+                    showMessage('操作成功');
+                    loadDishes();
+                },
+                error: function(xhr) {
+                    var msg = (xhr.responseJSON && xhr.responseJSON.detail) ? xhr.responseJSON.detail : '操作失败';
+                    showMessage(msg, 'danger');
+                }
+            });
+        });
+        
+        function loadDishes(page, pageSize) {
+            page = page || 1;
+            pageSize = pageSize || 10;
+            var skip = (page - 1) * pageSize;
+            var keyword = $('#searchInput').val();
+            var dishType = $('#dishTypeSelect').val();
+            var flavor = $('#flavorSelect').val();
+            
+            showLoading('正在加载菜品数据...');
+            
+            var countParams = { keyword: keyword, dish_type: dishType, flavor: flavor };
+            var listParams = { skip: skip, limit: pageSize, keyword: keyword, dish_type: dishType, flavor: flavor };
+            
+            $.ajax({
+                url: '/menu_items/count',
+                type: 'GET',
+                data: countParams,
+                dataType: 'json',
+                success: function(countResp) {
+                    var total = countResp.total || 0;
+                    $.ajax({
+                        url: '/menu_items/',
+                        type: 'GET',
+                        data: listParams,
+                        dataType: 'json',
+                        success: function(items) {
+                            hideLoading();
+                            renderDishTable({
+                                items: items,
+                                total: total,
+                                page: page,
+                                page_size: pageSize
+                            });
+                        },
+                        error: function() {
+                            hideLoading();
+                            showMessage('加载菜品数据失败', 'danger');
+                        }
+                    });
+                },
+                error: function() {
+                    hideLoading();
+                    showMessage('加载总数失败', 'danger');
+                }
+            });
+        }
+        
+        function renderDishTable(data) {
+            var tbody = $('#dishTableBody');
+            tbody.empty();
+            var items = data.items || [];
+            var total = data.total || 0;
+            var page = data.page || 1;
+            var pageSize = data.page_size || 10;
+            
+            if (items.length > 0) {
+                var typeMap = { breakfast: '早餐', lunch: '午餐', dinner: '晚餐' };
+                items.forEach(function(dish, i) {
+                    var row = $('<tr></tr>');
+                    row.append($('<td></td>').text((page - 1) * pageSize + i + 1));
+                    row.append($('<td></td>').text(dish.dish_name));
+                    row.append($('<td></td>').text(typeMap[dish.dish_type] || dish.dish_type));
+                    row.append($('<td></td>').text(dish.category || '-'));
+                    row.append($('<td></td>').text((dish.dish_recipe || '').substring(0, 50) + ((dish.dish_recipe || '').length > 50 ? '...' : '')));
+                    row.append($('<td></td>').text((dish.total_calories || 0) + ' kcal / ' + (dish.total_protein || 0) + 'g 蛋白'));
+                    var actions = '<div class="btn-group"><a href="#" class="btn btn-primary btn-xs edit-dish" data-id="' + dish.id + '">编辑</a>';
+                    actions += '<a href="#" class="btn btn-danger btn-xs delete-dish" data-id="' + dish.id + '">删除</a></div>';
+                    row.append($('<td></td>').html(actions));
+                    tbody.append(row);
+                });
+                bindDishActions();
+            } else {
+                tbody.append('<tr><td colspan="7" class="text-center">暂无数据</td></tr>');
+            }
+            
+            var totalPages = Math.ceil(total / pageSize) || 1;
+            $('#dishTableInfo').text('显示 ' + ((page - 1) * pageSize + 1) + ' 到 ' + Math.min(page * pageSize, total) + ' 条，共 ' + total + ' 条记录');
+            
+            var pg = '';
+            pg += '<li class="page-item' + (page === 1 ? ' disabled' : '') + '"><a class="page-link" href="#" data-page="' + (page - 1) + '">上一页</a></li>';
+            for (var i = 1; i <= totalPages; i++) {
+                pg += '<li class="page-item' + (page === i ? ' active' : '') + '"><a class="page-link" href="#" data-page="' + i + '">' + i + '</a></li>';
+            }
+            pg += '<li class="page-item' + (page === totalPages ? ' disabled' : '') + '"><a class="page-link" href="#" data-page="' + (page + 1) + '">下一页</a></li>';
+            $('#dishTablePagination ul').html(pg);
+            
+            $('#dishTablePagination .page-link').click(function(e) {
+                e.preventDefault();
+                var p = $(this).data('page');
+                if (p > 0 && p <= totalPages) loadDishes(p);
+            });
+        }
+        
+        function bindDishActions() {
+            $('.edit-dish').click(function(e) {
+                e.preventDefault();
+                var id = $(this).data('id');
+                $.ajax({
+                    url: '/menu_items/' + id,
+                    type: 'GET',
+                    dataType: 'json',
+                    success: function(d) {
+                        $('#dishId').val(d.id);
+                        $('#dishName').val(d.dish_name);
+                        $('#dishType').val(d.dish_type);
+                        $('#dishCategory').val(d.category || '');
+                        $('#dishRecipe').val(d.dish_recipe || '');
+                        $('#dishFlavor').val(d.flavor || '');
+                        $('#dishSeason').val(d.season || '');
+                        $('#dishCalories').val(d.total_calories || 0);
+                        $('#dishProtein').val(d.total_protein || 0);
+                        $('#dishFat').val(d.total_fat || 0);
+                        $('#dishCarbs').val(d.total_carbohydrates || 0);
+                        $('#dishModalLabel').text('编辑菜品');
+                        $('#dishModal').modal('show');
+                    },
+                    error: function() { showMessage('获取菜品详情失败', 'danger'); }
+                });
+            });
+            
+            $('.delete-dish').click(function(e) {
+                e.preventDefault();
+                var id = $(this).data('id');
+                if (!confirm('确定要删除该菜品吗？仅管理员可执行删除。')) return;
+                $.ajax({
+                    url: '/menu_items/' + id,
+                    type: 'DELETE',
+                    success: function() {
+                        showMessage('删除成功');
+                        loadDishes();
+                    },
+                    error: function(xhr) {
+                        var msg = (xhr.responseJSON && xhr.responseJSON.detail) ? xhr.responseJSON.detail : '删除失败（需管理员权限）';
+                        showMessage(msg, 'danger');
+                    }
+                });
+            });
+        }
+    });
+</script>
+{% endblock %}
